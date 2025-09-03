@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/x-icon" href="https://i.postimg.cc/HjcxPwZL/Valet-Droid-Logo-final.png
+">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Valet Droid Feedback Form</title>
+  <style>
+    body{font-family:Arial, sans-serif;background:#f6f7f9;margin:0}
+    .wrap{max-width:700px;margin:40px auto;background:#fff;border-radius:12px;padding:30px;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+    .header{display:flex;align-items:center;gap:15px;margin-bottom:20px}
+    .header img{width:60px;height:60px;border-radius:8px}
+    h1{margin:0;font-size:1.6rem}
+    .q{margin-top:20px}
+    .qlabel{font-weight:bold;margin-bottom:10px;display:block}
+    .rating{display:inline-flex;flex-direction:row-reverse;gap:6px}
+    .rating input{display:none}
+    .rating label{font-size:28px;cursor:pointer;color:#cbd5e1;transition:color .2s}
+    .rating input:checked ~ label,.rating label:hover,.rating label:hover ~ label{color:#f59e0b}
+    textarea{width:100%;min-height:120px;padding:12px;border-radius:8px;border:1px solid #ccc;resize:vertical}
+    button{margin-top:20px;padding:12px 20px;border:none;border-radius:8px;background:#0ea5e9;color:#fff;font-weight:bold;cursor:pointer}
+    button:hover{background:#0284c7}
+    .hint{margin-top:8px;color:#555}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <img src="https://i.postimg.cc/HjcxPwZL/Valet-Droid-Logo-final.png" alt="Valet Droid logo" />
+      <h1>Valet Droid Feedback Form</h1>
+    </div>
+
+    <div class="q">
+      <label class="qlabel" for="rate-10">1. Rate Valet Droid *</label>
+      <div class="rating">
+        <input type="radio" id="rate-10" name="rating" value="10"><label for="rate-10">★</label>
+        <input type="radio" id="rate-9"  name="rating" value="9"><label for="rate-9">★</label>
+        <input type="radio" id="rate-8"  name="rating" value="8"><label for="rate-8">★</label>
+        <input type="radio" id="rate-7"  name="rating" value="7"><label for="rate-7">★</label>
+        <input type="radio" id="rate-6"  name="rating" value="6"><label for="rate-6">★</label>
+        <input type="radio" id="rate-5"  name="rating" value="5"><label for="rate-5">★</label>
+        <input type="radio" id="rate-4"  name="rating" value="4"><label for="rate-4">★</label>
+        <input type="radio" id="rate-3"  name="rating" value="3"><label for="rate-3">★</label>
+        <input type="radio" id="rate-2"  name="rating" value="2"><label for="rate-2">★</label>
+        <input type="radio" id="rate-1"  name="rating" value="1"><label for="rate-1">★</label>
+      </div>
+      <div class="hint" id="ratingValue"></div>
+    </div>
+
+    <div class="q">
+      <label class="qlabel" for="feedback">2. Feedback and Suggestions *</label>
+      <textarea id="feedback" placeholder="Enter your answer" required></textarea>
+    </div>
+
+    <button id="submitBtn" type="button">Submit</button>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTiecDEmXaP-POYl4dnJJuFtGxG156WupQBb44Ap49ro3vgck4QVIFksjF64UqLhhYVA/exec"; // <-- put your Apps Script /exec URL
+
+    // Show selected rating
+    const ratingInputs = document.querySelectorAll('input[name="rating"]');
+    const ratingValue = document.getElementById('ratingValue');
+    ratingInputs.forEach(i => i.addEventListener('change', () => {
+      ratingValue.textContent = `You selected ${i.value} / 10`;
+    }));
+
+    // Submit (URL-encoded to avoid CORS preflight)
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      const selected = document.querySelector('input[name="rating"]:checked');
+      const feedback = document.getElementById('feedback');
+
+      if (!selected) { alert('Please rate Valet Droid.'); return; }
+      if (!feedback.value.trim()) { alert('Please enter your feedback.'); feedback.focus(); return; }
+
+      const body = new URLSearchParams({ rating: selected.value, feedback: feedback.value.trim() });
+
+      try {
+        const resp = await fetch(SCRIPT_URL, { method: 'POST', body }); // no custom headers => no preflight
+        if (!resp.ok) throw new Error('Network response was not ok');
+        alert('Thank you! Your response was submitted.');
+        // reset
+        feedback.value = '';
+        ratingValue.textContent = '';
+        document.querySelectorAll('input[name="rating"]').forEach(r => r.checked = false);
+      } catch (err) {
+        alert('Failed to submit: ' + err.message + '\nCheck the checklist below.');
+      }
+    });
+  </script>
+</body>
+</html>
